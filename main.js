@@ -10,6 +10,7 @@ function initializeApp() {
   $(".position").after(position.lat + " " + position.long);
   getWeatherData();
   getTrailData();
+  getRestaurantData();
 }
 
 function generateRandomBearing() {
@@ -41,7 +42,7 @@ function calculateSecondPosition(lat1, lon1, bearing, distance) {
 }
 
 function getWeatherData(){
-  const settings = {
+  const options = {
       url: 'http://api.weatherbit.io/v2.0/forecast/daily',
       method: 'GET',
       data: {
@@ -59,12 +60,12 @@ function getWeatherData(){
         console.log("error");
       }
     }
-  $.ajax(settings);
+  $.ajax(options);
 }
 
 function getTrailData(){
-  const settings = {
-    async: true,
+  const options = {
+      async: true,
       crossDomain: true,
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
       method: 'GET',
@@ -78,11 +79,34 @@ function getTrailData(){
       success: function(response){
         console.log("success", response);
         const data = response;
-        $(".trails").append(data.results[0].name);
       },
       error: function(response){
         console.log("error");
       }
     }
-  $.ajax(settings);
+  $.ajax(options);
+}
+
+function getRestaurantData(){
+  const options = {
+      url: 'https://api.yelp.com/v3/businesses/search',
+      method: 'GET',
+      data: {
+        term: 'restaurant',
+        latitude: '33.5',
+        longitude: '-117.8',
+        sort_by: 'rating',
+        radius: '10000',
+        price: '1,2',
+        limit: '10'
+      },
+      success: function(response){
+        console.log("success", response);
+        const data = response;
+      },
+      error: function(response){
+        console.log("yelp error");
+      }
+    }
+  $.ajax(options);
 }
