@@ -6,8 +6,9 @@ function initializeApp() {
   const distance = 100;
   const bearing = generateRandomBearing();
   const position = calculateSecondPosition(lat, long, bearing, distance);
-  $(".bearing").after(bearing);
-  $(".position").after(position.lat + " " + position.long);
+  $('.bearing').after(bearing);
+  $('.position').after(position.lat + " " + position.long);
+  $('.distance').after(distance);
   getWeatherData(position.lat, position.long);
   getTrailData(position.lat, position.long);
   getCampgroundData(position.lat, position.long);
@@ -32,10 +33,12 @@ function calculateSecondPosition(lat1, lon1, bearing, distance) {
   const radius = 3958.761;
   lat1 *= Math.PI / 180;
   lon1 *= Math.PI / 180;
-  const lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / radius)
-    + Math.cos(lat1) * Math.sin(distance / radius) * Math.cos(bearing * Math.PI / 180));
-  const lon2 = lon1 + Math.atan2(Math.sin(bearing * Math.PI / 180) * Math.sin(distance / radius)
-    * Math.cos(lat1), Math.cos(distance / radius) - Math.sin(lat1) * Math.sin(lat2));
+  const lat2 = Math.asin(Math.sin(lat1) * Math.cos(distance / radius) +
+    Math.cos(lat1) * Math.sin(distance / radius) *
+    Math.cos(bearing * Math.PI / 180));
+  const lon2 = lon1 +
+    Math.atan2(Math.sin(bearing * Math.PI / 180) * Math.sin(distance / radius) *
+    Math.cos(lat1), Math.cos(distance / radius) - Math.sin(lat1) * Math.sin(lat2));
   return {
     'lat': lat2 * 180 / Math.PI,
     'long': lon2 * 180 / Math.PI
@@ -53,16 +56,41 @@ function getWeatherData(lat, long){
         key: config.weather.API_KEY
       },
       success: function(response){
-        console.log("success", response);
+        console.log("weather success", response);
+        const div = '<div>';
         const data = response;
-        $('.weather').append(data.data[0].weather.description);
+        let location = data.city_name + ', ';
+        location +=
+          data.country_code == 'US' ? data.state_code : data.country_code;
+        $('.location').append(div + location);
+        $('.weather').append(div + data.data[0].weather.description);
+        $('.weather').append(div + 'icon ' + data.data[0].weather.icon);
+        $('.weather').append(div + 'high ' + data.data[0].high_temp);
+        $('.weather').append(div + 'low ' + data.data[0].low_temp);
+        $('.weather').append(div + 'percip ' + data.data[0].percip);
+        $('.weather').append(div + 'wind ' + data.data[0].wind_spd);
+        $('.weather').append(div + 'gusts ' + data.data[0].wind_gust_spd);
       },
       error: function(response){
-        console.log("error");
+        console.log("weather error");
       }
     }
   $.ajax(options);
 }
+
+// weather data need:
+// city_name
+// country_code
+// data[0].
+//   high_temp
+//   low_temp
+//   percip
+//   weather.icon
+//   weather.description
+//   wind_gust_spd
+//   wind_spd
+// state_code
+
 
 function getTrailData(lat, long){
   const options = {
@@ -76,12 +104,12 @@ function getTrailData(lat, long){
         keyword: 'trailhead'
       },
       success: function(response){
-        console.log("success", response);
+        console.log("trail success", response);
         const data = response;
         $('.trails').append(data.results[0].name);
       },
       error: function(response){
-        console.log("error");
+        console.log("trail error");
       }
     }
   $.ajax(options);
@@ -99,12 +127,12 @@ function getCampgroundData(lat, long){
         keyword: 'campground'
       },
       success: function(response){
-        console.log("success", response);
+        console.log("campground success", response);
         const data = response;
         $('.campgrounds').append(data.results[0].name);
       },
       error: function(response){
-        console.log("error");
+        console.log("campground error");
       }
     }
   $.ajax(options);
@@ -128,7 +156,7 @@ function getRestaurantData(lat, long){
         limit: '10'
       },
       success: function(response){
-        console.log("success", response);
+        console.log("yelp success", response);
         const data = response;
         $('.restaurants').append(data.businesses[0].name);
       },
