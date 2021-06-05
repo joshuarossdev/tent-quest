@@ -57,19 +57,7 @@ function getWeatherData(lat, long){
       },
       success: function(response){
         console.log("weather success", response);
-        const div = '<div>';
-        const data = response;
-        let location = data.city_name + ', ';
-        location +=
-          data.country_code == 'US' ? data.state_code : data.country_code;
-        $('.location').append(div + location);
-        $('.weather').append(div + data.data[0].weather.description);
-        $('.weather').append(div + 'icon ' + data.data[0].weather.icon);
-        $('.weather').append(div + 'high ' + data.data[0].high_temp);
-        $('.weather').append(div + 'low ' + data.data[0].low_temp);
-        $('.weather').append(div + 'percip ' + data.data[0].percip);
-        $('.weather').append(div + 'wind ' + data.data[0].wind_spd);
-        $('.weather').append(div + 'gusts ' + data.data[0].wind_gust_spd);
+        renderWeatherData(response);
       },
       error: function(response){
         console.log("weather error");
@@ -78,18 +66,19 @@ function getWeatherData(lat, long){
   $.ajax(options);
 }
 
-// weather data need:
-// city_name
-// country_code
-// data[0].
-//   high_temp
-//   low_temp
-//   percip
-//   weather.icon
-//   weather.description
-//   wind_gust_spd
-//   wind_spd
-// state_code
+function renderWeatherData(data) {
+  const div = '<div>';
+  let location = data.city_name + ', ';
+  location += data.country_code == 'US' ? data.state_code : data.country_code;
+  $('.location').append(div + location);
+  $('.weather').append(div + data.data[0].weather.description);
+  $('.weather').append(div + 'icon ' + data.data[0].weather.icon);
+  $('.weather').append(div + 'high ' + data.data[0].high_temp);
+  $('.weather').append(div + 'low ' + data.data[0].low_temp);
+  $('.weather').append(div + 'percip ' + data.data[0].percip);
+  $('.weather').append(div + 'wind ' + data.data[0].wind_spd);
+  $('.weather').append(div + 'gusts ' + data.data[0].wind_gust_spd);
+}
 
 
 function getTrailData(lat, long){
@@ -99,20 +88,27 @@ function getTrailData(lat, long){
       headers: {},
       data: {
         location: lat + ', ' + long,
-        radius: '6000',
+        radius: '30000',
         key: config.trails.API_KEY,
         keyword: 'trailhead'
       },
       success: function(response){
-        console.log("trail success", response);
-        const data = response;
-        $('.trails').append(data.results[0].name);
+        console.log('trail success', response);
+        renderTrailData(response);
       },
       error: function(response){
-        console.log("trail error");
+        console.log('trail error');
       }
     }
   $.ajax(options);
+}
+
+function renderTrailData(data) {
+  const div = '<div>';
+  $('.trails').append(div + data.results[0].name);
+  $('.trails').append(div + 'rating: ' + data.results[0].rating);
+  $('.trails').append(div + 'reviews: ' + data.results[0].user_ratings_total);
+  $('.trails').append(div + 'photo: ' + data.results[0].photos[0].photo_reference);
 }
 
 function getCampgroundData(lat, long){
