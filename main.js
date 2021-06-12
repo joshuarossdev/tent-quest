@@ -10,7 +10,7 @@ function initializeApp() {
   $('.position').after(position.lat + " " + position.long);
   $('.distance').after(distance);
   getWeatherData(position.lat, position.long);
-  getTrailData(position.lat, position.long);
+  getTrailData(position.lat, position.long, 10000);
   getCampgroundData(position.lat, position.long);
   getRestaurantData(position.lat, position.long);
 }
@@ -81,20 +81,29 @@ function renderWeatherData(data) {
 }
 
 
-function getTrailData(lat, long){
+function getTrailData(lat, long, radius){
   const options = {
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
       method: 'GET',
       headers: {},
       data: {
         location: lat + ', ' + long,
-        radius: '30000',
+        radius: radius,
         key: config.trails.API_KEY,
         keyword: 'trailhead'
       },
       success: function(response){
-        console.log('trail success', response);
-        renderTrailData(response);
+        if (response.results[0]) {
+          console.log('trail success', response);
+          renderTrailData(response);
+        } else if (radius <= 150000 && !response.results[0]) {
+          console.log('retry trail data. radius: ' + radius)
+          getTrailData (lat, long, radius*2);
+        } else {
+          console.log('trail data no results');
+          renderTrailData('No Results');
+        }
+
       },
       error: function(response){
         console.log('trail error');
@@ -105,10 +114,14 @@ function getTrailData(lat, long){
 
 function renderTrailData(data) {
   const div = '<div>';
-  $('.trails').append(div + data.results[0].name);
-  $('.trails').append(div + 'rating: ' + data.results[0].rating);
-  $('.trails').append(div + 'reviews: ' + data.results[0].user_ratings_total);
-  $('.trails').append(div + 'photo: ' + data.results[0].photos[0].photo_reference);
+  if (data != 'No Results') {
+    $('.trails').append(div + data.results[0].name);
+    $('.trails').append(div + 'rating: ' + data.results[0].rating);
+    $('.trails').append(div + 'reviews: ' + data.results[0].user_ratings_total);
+    $('.trails').append(div + 'photo: ' + data.results[0].photos[0].photo_reference);
+  } else {
+     $('.trails').append(div + data);
+  }
 }
 
 function getCampgroundData(lat, long){
