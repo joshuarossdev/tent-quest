@@ -5,9 +5,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_hLk7PSfWGdfOf0OCRgVdtx7zr-xzZQw"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="config.js"></script>
-  <script src="main.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/main.js"></script>
   <title>Document</title>
 </head>
 <body>
@@ -18,7 +20,7 @@
     <div class="map-container">
       <div id="test" class="bearing">Bearing</div>
       <div class="position">Position</div>
-      <div class="map">Map</div>
+      <div class="map" id="map"></div>
       <div class="distance">Distance</div>
       <div class="location">---Location---</div>
       <div class="results">
