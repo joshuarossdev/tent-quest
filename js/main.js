@@ -13,6 +13,9 @@ function initializeApp() {
   getTrailData(position.lat, position.long, 10000);
   getCampgroundData(position.lat, position.long);
   getRestaurantData(position.lat, position.long);
+  appMap = new Map(38.95, -94.63, 4, 'map');
+  appMap.initMap();
+  appMap.addMapListener();
 }
 
 function generateRandomBearing() {
@@ -81,7 +84,7 @@ function renderWeatherData(data) {
 }
 
 
-function getTrailData(lat, long, radius){
+function getTrailData(lat, long, radius) {
   const options = {
       url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
       method: 'GET',
@@ -89,27 +92,30 @@ function getTrailData(lat, long, radius){
       data: {
         location: lat + ', ' + long,
         radius: radius,
-        key: config.trails.API_KEY,
+        key: config.maps.API_KEY,
         keyword: 'trailhead'
       },
-      success: function(response){
+      success: function(response) {
         if (response.results[0]) {
           console.log('trail success', response);
           renderTrailData(response);
         } else if (radius <= 150000 && !response.results[0]) {
-          console.log('retry trail data. radius: ' + radius)
+          console.log('retry trail data. radius: ' + radius);
           getTrailData (lat, long, radius*2);
         } else {
           console.log('trail data no results');
           renderTrailData('No Results');
         }
-
       },
       error: function(response){
         console.log('trail error');
       }
     }
   $.ajax(options);
+}
+
+function verifyTrailData(data) {
+
 }
 
 function renderTrailData(data) {
@@ -132,22 +138,22 @@ function getCampgroundData(lat, long){
       data: {
         location: lat + ', ' + long,
         radius: '6000',
-        key: config.trails.API_KEY,
+        key: config.maps.API_KEY,
         keyword: 'campground'
       },
-      success: function(response){
+      success: function(response) {
         console.log("campground success", response);
         const data = response;
         $('.campgrounds').append(data.results[0].name);
       },
-      error: function(response){
+      error: function(response) {
         console.log("campground error");
       }
     }
   $.ajax(options);
 }
 
-function getRestaurantData(lat, long){
+function getRestaurantData(lat, long) {
   const options = {
       url: 'https://api.yelp.com/v3/businesses/search',
       method: 'GET',
@@ -164,12 +170,12 @@ function getRestaurantData(lat, long){
         price: '1,2',
         limit: '10'
       },
-      success: function(response){
+      success: function(response) {
         console.log("yelp success", response);
         const data = response;
         $('.restaurants').append(data.businesses[0].name);
       },
-      error: function(response){
+      error: function(response) {
         console.log("yelp error");
       }
     }
